@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  db:
+    container_name: wplocal-db
+    image: mysql:5.7
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+  wordpress:
+    build: .
+    container_name: wplocal
+    depends_on:
+      - db
+    volumes:
+      - ./public_html:/var/www/html
+      - ./apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+
+volumes:
+  dbdata:
